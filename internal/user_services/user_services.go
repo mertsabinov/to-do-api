@@ -21,3 +21,15 @@ func (db Db) Add(key string, value string) error {
 	}
 	return nil
 }
+
+func (db Db) Remove(key string) error {
+	_, err := db.Search(key)
+	switch err {
+	case nil:
+		delete(db, key)
+		break
+	case UsKeyNotFound:
+		return UsKeyNotFound
+	}
+	return nil
+}
