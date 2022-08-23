@@ -35,3 +35,11 @@ func TestDb_Add(t *testing.T) {
 	want := "value"
 	Check(t, got, want)
 }
+
+func TestDb_Remove(t *testing.T) {
+	err := testData.Remove("key")
+	CheckError(t, err)
+	_, got := testData.Search("key")
+	want := UsKeyNotFound
+	Check(t, got.Error(), want.Error())
+}
