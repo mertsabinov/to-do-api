@@ -1,16 +1,18 @@
 package user_services
 
-type Db map[string]string
+import "api/internal/model"
 
-func (db Db) Search(key string) (string, error) {
+type Db map[string]model.Todo
+
+func (db Db) Search(key string) (model.Todo, error) {
 	result, ok := db[key]
 	if !ok {
-		return "", UsKeyNotFound
+		return model.Todo{}, UsKeyNotFound
 	}
 	return result, nil
 }
 
-func (db Db) Add(key string, value string) error {
+func (db Db) Add(key string, value model.Todo) error {
 	_, err := db.Search(key)
 	switch err {
 	case nil:
