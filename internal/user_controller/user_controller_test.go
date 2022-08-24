@@ -1,7 +1,9 @@
 package user_controller
 
 import (
+	"api/internal/model"
 	"api/internal/user_services"
+	"bytes"
 	"encoding/json"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
@@ -11,6 +13,7 @@ import (
 )
 
 var Url string = "http://localhost:8080/"
+var Router = StartTest()
 
 func StartTest() *gin.Engine {
 	r := gin.Default()
@@ -29,20 +32,43 @@ func CheckError(t *testing.T, err error) {
 	}
 }
 
+func ConvertStructToJson(t *testing.T, want model.Todo) string {
+	wantByte, err := json.Marshal(want)
+	CheckError(t, err)
+	return string(wantByte)
+}
+
 func ConvertMapToJsonString(t *testing.T, want map[string]string) string {
 	wantByte, err := json.Marshal(want)
 	CheckError(t, err)
 	return string(wantByte)
 }
 
+func ConvertMapToIoReader(t *testing.T, want model.Todo) *bytes.Reader {
+	requestByte, _ := json.Marshal(want)
+	requestReader := bytes.NewReader(requestByte)
+	return requestReader
+}
+
 func TestUserController_Ping(t *testing.T) {
-	router := StartTest()
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest("GET", Url+"v1/user/ping", nil)
-	router.ServeHTTP(w, req)
+	Router.ServeHTTP(w, req)
 	want := map[string]string{
 		"message": "pong",
 	}
 	assert.Equal(t, http.StatusOK, w.Code)
 	assert.Equal(t, ConvertMapToJsonString(t, want), w.Body.String())
+}
+
+func TestUserController_Add(t *testing.T) {
+	want := model.Todo{
+		Key:   "testKey",
+		Value: "testValue",
+	}
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest("POST", Url+"v1/user/add", ConvertMapToIoReader(t, want))
+	Router.ServeHTTP(w, req)
+	assert.Equal(t, http.StatusOK, w.Code)
+	assert.Equal(t, ConvertStructToJson(t, want), w.Body.String())
 }
