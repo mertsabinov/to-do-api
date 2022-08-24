@@ -1,9 +1,15 @@
 package user_services
 
-import "testing"
+import (
+	"api/internal/model"
+	"testing"
+)
 
 var testData = Db{
-	"test": "test",
+	"1": model.Todo{
+		Key:   "test",
+		Value: "test",
+	},
 }
 
 func CheckError(t *testing.T, err error) {
@@ -13,7 +19,14 @@ func CheckError(t *testing.T, err error) {
 	}
 }
 
-func Check(t *testing.T, got string, want string) {
+func Check(t *testing.T, got model.Todo, want model.Todo) {
+	t.Helper()
+	if got != want {
+		t.Errorf("got = %v want = %v", got, want)
+	}
+}
+
+func CheckErrorEqual(t *testing.T, got error, want error) {
 	t.Helper()
 	if got != want {
 		t.Errorf("got = %s want = %s", got, want)
@@ -21,25 +34,25 @@ func Check(t *testing.T, got string, want string) {
 }
 
 func TestDb_Search(t *testing.T) {
-	got, err := testData.Search("test")
+	got, err := testData.Search("1")
 	CheckError(t, err)
-	want := "test"
+	want := model.Todo{Key: "test", Value: "test"}
 	Check(t, got, want)
 }
 
 func TestDb_Add(t *testing.T) {
-	err := testData.Add("key", "value")
+	err := testData.Add("2", model.Todo{Key: "testkey", Value: "testValue"})
 	CheckError(t, err)
-	got, err := testData.Search("key")
+	got, err := testData.Search("2")
 	CheckError(t, err)
-	want := "value"
+	want := model.Todo{Key: "testkey", Value: "testValue"}
 	Check(t, got, want)
 }
 
 func TestDb_Remove(t *testing.T) {
-	err := testData.Remove("key")
+	err := testData.Remove("2")
 	CheckError(t, err)
-	_, got := testData.Search("key")
+	_, got := testData.Search("2")
 	want := UsKeyNotFound
-	Check(t, got.Error(), want.Error())
+	CheckErrorEqual(t, got, want)
 }
