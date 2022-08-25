@@ -2,7 +2,7 @@ package user_services
 
 import (
 	"api/internal/model"
-	"encoding/json"
+	"reflect"
 	"testing"
 )
 
@@ -59,10 +59,15 @@ func TestDb_Remove(t *testing.T) {
 }
 
 func TestDb_GetAll(t *testing.T) {
-	got, err := testData.GetAll()
-	CheckError(t, err)
-	want, _ := json.Marshal(testData)
-	if got != string(want) {
-		t.Errorf("got = %s, want = %s", got, want)
+	got := testData.GetAll()
+	want := Db{
+		"1": model.Todo{
+			Key:   "test",
+			Value: "test",
+		},
+	}
+
+	if !reflect.DeepEqual(got, want) {
+		t.Errorf("got = %q, want = %q", got, want)
 	}
 }
