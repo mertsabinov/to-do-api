@@ -2,6 +2,7 @@ package user_services
 
 import (
 	"api/internal/model"
+	"encoding/json"
 	"testing"
 )
 
@@ -55,4 +56,13 @@ func TestDb_Remove(t *testing.T) {
 	_, got := testData.Search("2")
 	want := UsKeyNotFound
 	CheckErrorEqual(t, got, want)
+}
+
+func TestDb_GetAll(t *testing.T) {
+	got, err := testData.GetAll()
+	CheckError(t, err)
+	want, _ := json.Marshal(testData)
+	if got != string(want) {
+		t.Errorf("got = %s, want = %s", got, want)
+	}
 }
