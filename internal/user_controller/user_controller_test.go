@@ -2,6 +2,7 @@ package user_controller
 
 import (
 	"api/internal/model"
+	"api/internal/model/request_model"
 	"api/internal/user_services"
 	"bytes"
 	"encoding/json"
@@ -49,7 +50,13 @@ func ConvertMapToJsonString(t *testing.T, want map[string]string) string {
 	return string(wantByte)
 }
 
-func ConvertMapToIoReader(t *testing.T, want model.Todo) *bytes.Reader {
+func ConvertTodoToIoReader(t *testing.T, want model.Todo) *bytes.Reader {
+	requestByte, _ := json.Marshal(want)
+	requestReader := bytes.NewReader(requestByte)
+	return requestReader
+}
+
+func ConvertTestRequestIdToIoReader(t *testing.T, want request_model.RequestId) *bytes.Reader {
 	requestByte, _ := json.Marshal(want)
 	requestReader := bytes.NewReader(requestByte)
 	return requestReader
@@ -90,8 +97,36 @@ func TestUserController_Add(t *testing.T) {
 		Value: "testValue",
 	}
 	w := httptest.NewRecorder()
-	req, _ := http.NewRequest("POST", Url+"v1/user/add", ConvertMapToIoReader(t, want))
+	req, _ := http.NewRequest("POST", Url+"v1/user/add", ConvertTodoToIoReader(t, want))
 	Router.ServeHTTP(w, req)
 	assert.Equal(t, http.StatusOK, w.Code)
 	assert.Equal(t, ConvertStructToJson(t, want), w.Body.String())
+}
+
+func TestUserController_Delete(t *testing.T) {
+	t.Run("Delete (ok)", func(t *testing.T) {
+		testId := request_model.RequestId{
+			Id: "1",
+		}
+		w := httptest.NewRecorder()
+		req, err := http.NewRequest("DELETE", Url+"v1/user/todo", ConvertTestRequestIdToIoReader(t, testId))
+		CheckError(t, err)
+		Router.ServeHTTP(w, req)
+		assert.Equal(t, http.StatusOK, w.Code)
+		got := `{"message":"ok"}`
+		assert.Equal(t, got, w.Body.String())
+	})
+
+	t.Run("Delete (Error)", func(t *testing.T) {
+		testId := request_model.RequestId{
+			Id: "2",
+		}
+		w := httptest.NewRecorder()
+		req, err := http.NewRequest("DELETE", Url+"v1/user/todo", ConvertTestRequestIdToIoReader(t, testId))
+		CheckError(t, err)
+		Router.ServeHTTP(w, req)
+		assert.Equal(t, http.StatusBadRequest, w.Code)
+		got := `{"message":"This key is not found"}`
+		assert.Equal(t, got, w.Body.String())
+	})
 }
