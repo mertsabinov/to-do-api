@@ -9,6 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 )
 
@@ -71,4 +72,22 @@ func TestUserController_Add(t *testing.T) {
 	Router.ServeHTTP(w, req)
 	assert.Equal(t, http.StatusOK, w.Code)
 	assert.Equal(t, ConvertStructToJson(t, want), w.Body.String())
+}
+
+func TestUserController_GetAll(t *testing.T) {
+	var got model.Todo
+	want := model.Todo{
+		Key:   "testKey",
+		Value: "testValue",
+	}
+	w := httptest.NewRecorder()
+	req, err := http.NewRequest("GET", Url+"v1/user/todo", nil)
+	CheckError(t, err)
+	Router.ServeHTTP(w, req)
+	body := strings.ReplaceAll(w.Body.String(), `\`, "")
+	body = body[strings.Index(body, ":")+1 : len(body)-2]
+	err = json.Unmarshal([]byte(body), &got)
+	CheckError(t, err)
+	assert.Equal(t, http.StatusOK, w.Code)
+	assert.Equal(t, want, got)
 }
