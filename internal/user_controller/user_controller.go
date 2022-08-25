@@ -35,10 +35,7 @@ func (us *UserController) Add(ctx *gin.Context) {
 }
 
 func (us *UserController) GetAll(ctx *gin.Context) {
-	data, err := us.UserServices.GetAll()
-	if err != nil {
-		ctx.JSONP(http.StatusBadRequest, gin.H{"message": err})
-	}
+	data := us.UserServices.GetAll()
 	ctx.JSONP(http.StatusOK, data)
 }
 
