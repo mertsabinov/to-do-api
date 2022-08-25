@@ -1,6 +1,9 @@
 package user_services
 
-import "api/internal/model"
+import (
+	"api/internal/model"
+	"encoding/json"
+)
 
 type Db map[string]model.Todo
 
@@ -34,4 +37,12 @@ func (db Db) Remove(key string) error {
 		return UsKeyNotFound
 	}
 	return nil
+}
+
+func (db Db) GetAll() (string, error) {
+	data, err := json.Marshal(db)
+	if err != nil {
+		return "", err
+	}
+	return string(data), nil
 }
