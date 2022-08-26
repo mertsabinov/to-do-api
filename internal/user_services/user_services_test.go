@@ -2,12 +2,14 @@ package user_services
 
 import (
 	"api/internal/model"
+	"api/internal/model/request_model"
 	"reflect"
 	"testing"
 )
 
 var testData = Db{
-	"1": model.Todo{
+	{
+		Id:    "1",
 		Key:   "test",
 		Value: "test",
 	},
@@ -37,16 +39,16 @@ func CheckErrorEqual(t *testing.T, got error, want error) {
 func TestDb_Search(t *testing.T) {
 	got, err := testData.Search("1")
 	CheckError(t, err)
-	want := model.Todo{Key: "test", Value: "test"}
+	want := model.Todo{Id: "1", Key: "test", Value: "test"}
 	Check(t, got, want)
 }
 
 func TestDb_Add(t *testing.T) {
-	err := testData.Add("2", model.Todo{Key: "testkey", Value: "testValue"})
+	err := testData.Add("2", request_model.RequestTodo{Key: "testkey", Value: "testValue"})
 	CheckError(t, err)
 	got, err := testData.Search("2")
 	CheckError(t, err)
-	want := model.Todo{Key: "testkey", Value: "testValue"}
+	want := model.Todo{Id: "2", Key: "testkey", Value: "testValue"}
 	Check(t, got, want)
 }
 
@@ -61,7 +63,8 @@ func TestDb_Remove(t *testing.T) {
 func TestDb_GetAll(t *testing.T) {
 	got := testData.GetAll()
 	want := Db{
-		"1": model.Todo{
+		{
+			Id:    "1",
 			Key:   "test",
 			Value: "test",
 		},
