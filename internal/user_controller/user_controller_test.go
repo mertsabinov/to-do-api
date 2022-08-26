@@ -1,7 +1,6 @@
 package user_controller
 
 import (
-	"api/internal/model"
 	"api/internal/model/request_model"
 	"api/internal/user_services"
 	"bytes"
@@ -19,7 +18,8 @@ var Router = StartTest()
 func StartTest() *gin.Engine {
 	r := gin.Default()
 	us := user_services.Db{
-		"1": model.Todo{
+		{
+			Id:    "1",
 			Key:   "test key",
 			Value: "test value",
 		},
@@ -38,7 +38,7 @@ func CheckError(t *testing.T, err error) {
 	}
 }
 
-func ConvertStructToJson(t *testing.T, want model.Todo) string {
+func ConvertStructToJson(t *testing.T, want request_model.RequestTodo) string {
 	wantByte, err := json.Marshal(want)
 	CheckError(t, err)
 	return string(wantByte)
@@ -50,7 +50,7 @@ func ConvertMapToJsonString(t *testing.T, want map[string]string) string {
 	return string(wantByte)
 }
 
-func ConvertTodoToIoReader(t *testing.T, want model.Todo) *bytes.Reader {
+func ConvertTodoToIoReader(t *testing.T, want request_model.RequestTodo) *bytes.Reader {
 	requestByte, _ := json.Marshal(want)
 	requestReader := bytes.NewReader(requestByte)
 	return requestReader
@@ -76,7 +76,8 @@ func TestUserController_Ping(t *testing.T) {
 func TestUserController_GetAll(t *testing.T) {
 	var got user_services.Db
 	want := user_services.Db{
-		"1": model.Todo{
+		{
+			Id:    "1",
 			Key:   "test key",
 			Value: "test value",
 		},
@@ -92,7 +93,7 @@ func TestUserController_GetAll(t *testing.T) {
 }
 
 func TestUserController_Add(t *testing.T) {
-	want := model.Todo{
+	want := request_model.RequestTodo{
 		Key:   "testKey",
 		Value: "testValue",
 	}
