@@ -1,7 +1,6 @@
 package user_controller
 
 import (
-	"api/internal/model"
 	"api/internal/model/request_model"
 	"api/internal/user_services"
 	"github.com/gin-gonic/gin"
@@ -24,7 +23,7 @@ func (us *UserController) Ping(ctx *gin.Context) {
 }
 
 func (us *UserController) Add(ctx *gin.Context) {
-	var todo model.Todo
+	var todo request_model.RequestTodo
 	err := ctx.ShouldBindJSON(&todo)
 	newId := uuid.NewString()
 	err = us.UserServices.Add(newId, todo)
