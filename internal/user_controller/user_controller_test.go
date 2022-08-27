@@ -73,14 +73,12 @@ func TestUserController_Ping(t *testing.T) {
 }
 
 func TestUserController_GetAll(t *testing.T) {
-	var got user_service.UserService
-	want := user_service.UserService{
-		Db: []model.Todo{
-			{
-				Id:    "1",
-				Key:   "test key",
-				Value: "test value",
-			},
+	var got []model.Todo
+	want := []model.Todo{
+		{
+			Id:    "1",
+			Key:   "test key",
+			Value: "test value",
 		},
 	}
 	w := httptest.NewRecorder()
