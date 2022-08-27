@@ -2,7 +2,7 @@ package user_controller
 
 import (
 	"api/internal/model/model_request"
-	user_service "api/internal/user_services"
+	user_service "api/internal/user_service"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"net/http"

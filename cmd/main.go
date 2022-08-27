@@ -3,7 +3,7 @@ package main
 import (
 	"api/internal/model"
 	"api/internal/user_controller"
-	"api/internal/user_services"
+	"api/internal/user_service"
 	"github.com/gin-gonic/gin"
 )
 

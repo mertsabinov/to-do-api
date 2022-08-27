@@ -3,7 +3,7 @@ package user_controller
 import (
 	"api/internal/model"
 	"api/internal/model/model_request"
-	user_service "api/internal/user_services"
+	user_service "api/internal/user_service"
 	"bytes"
 	"encoding/json"
 	"github.com/gin-gonic/gin"
