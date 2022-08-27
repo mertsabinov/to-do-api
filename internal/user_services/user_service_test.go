@@ -1,17 +1,19 @@
-package user_services
+package user_service
 
 import (
 	"api/internal/model"
-	"api/internal/model/request_model"
+	"api/internal/model/model_request"
 	"reflect"
 	"testing"
 )
 
-var testData = Db{
-	{
-		Id:    "1",
-		Key:   "test",
-		Value: "test",
+var testData = UserService{
+	Db: []model.Todo{
+		{
+			Id:    "1",
+			Key:   "test",
+			Value: "test",
+		},
 	},
 }
 
@@ -44,7 +46,7 @@ func TestDb_Search(t *testing.T) {
 }
 
 func TestDb_Add(t *testing.T) {
-	err := testData.Add("2", request_model.RequestTodo{Key: "testkey", Value: "testValue"})
+	err := testData.Add("2", model_request.RequestTodo{Key: "testkey", Value: "testValue"})
 	CheckError(t, err)
 	got, err := testData.Search("2")
 	CheckError(t, err)
@@ -62,7 +64,7 @@ func TestDb_Remove(t *testing.T) {
 
 func TestDb_GetAll(t *testing.T) {
 	got := testData.GetAll()
-	want := Db{
+	want := []model.Todo{
 		{
 			Id:    "1",
 			Key:   "test",

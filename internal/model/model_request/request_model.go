@@ -1,4 +1,4 @@
-package request_model
+package model_request
 
 type RequestId struct {
 	Id string

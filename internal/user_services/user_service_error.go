@@ -1,4 +1,4 @@
-package user_services
+package user_service
 
 type UserServicesError string
 
@@ -10,4 +10,3 @@ const (
 func (us UserServicesError) Error() string {
 	return string(us)
 }
-

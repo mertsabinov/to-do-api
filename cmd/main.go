@@ -1,6 +1,7 @@
 package main
 
 import (
+	"api/internal/model"
 	"api/internal/user_controller"
 	"api/internal/user_services"
 	"github.com/gin-gonic/gin"
@@ -8,7 +9,7 @@ import (
 
 func Start() *gin.Engine {
 	r := gin.Default()
-	us := user_services.Db{}
+	us := user_service.NewUserService([]model.Todo{})
 	uc := user_controller.NewUserConroller(us)
 	basepath := r.Group("/v1")
 	uc.UserControllerRout(basepath)

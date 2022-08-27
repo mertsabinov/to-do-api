@@ -1,8 +1,9 @@
 package user_controller
 
 import (
-	"api/internal/model/request_model"
-	"api/internal/user_services"
+	"api/internal/model"
+	"api/internal/model/model_request"
+	user_service "api/internal/user_services"
 	"bytes"
 	"encoding/json"
 	"github.com/gin-gonic/gin"
@@ -17,13 +18,11 @@ var Router = StartTest()
 
 func StartTest() *gin.Engine {
 	r := gin.Default()
-	us := user_services.Db{
-		{
-			Id:    "1",
-			Key:   "test key",
-			Value: "test value",
-		},
-	}
+	us := user_service.NewUserService([]model.Todo{{
+		Id:    "1",
+		Key:   "test key",
+		Value: "test value",
+	}})
 	uc := NewUserConroller(us)
 
 	basepath := r.Group("/v1")
@@ -38,7 +37,7 @@ func CheckError(t *testing.T, err error) {
 	}
 }
 
-func ConvertStructToJson(t *testing.T, want request_model.RequestTodo) string {
+func ConvertStructToJson(t *testing.T, want model_request.RequestTodo) string {
 	wantByte, err := json.Marshal(want)
 	CheckError(t, err)
 	return string(wantByte)
@@ -50,13 +49,13 @@ func ConvertMapToJsonString(t *testing.T, want map[string]string) string {
 	return string(wantByte)
 }
 
-func ConvertTodoToIoReader(t *testing.T, want request_model.RequestTodo) *bytes.Reader {
+func ConvertTodoToIoReader(t *testing.T, want model_request.RequestTodo) *bytes.Reader {
 	requestByte, _ := json.Marshal(want)
 	requestReader := bytes.NewReader(requestByte)
 	return requestReader
 }
 
-func ConvertTestRequestIdToIoReader(t *testing.T, want request_model.RequestId) *bytes.Reader {
+func ConvertTestRequestIdToIoReader(t *testing.T, want model_request.RequestId) *bytes.Reader {
 	requestByte, _ := json.Marshal(want)
 	requestReader := bytes.NewReader(requestByte)
 	return requestReader
@@ -74,12 +73,14 @@ func TestUserController_Ping(t *testing.T) {
 }
 
 func TestUserController_GetAll(t *testing.T) {
-	var got user_services.Db
-	want := user_services.Db{
-		{
-			Id:    "1",
-			Key:   "test key",
-			Value: "test value",
+	var got user_service.UserService
+	want := user_service.UserService{
+		Db: []model.Todo{
+			{
+				Id:    "1",
+				Key:   "test key",
+				Value: "test value",
+			},
 		},
 	}
 	w := httptest.NewRecorder()
@@ -93,12 +94,12 @@ func TestUserController_GetAll(t *testing.T) {
 }
 
 func TestUserController_Add(t *testing.T) {
-	want := request_model.RequestTodo{
+	want := model_request.RequestTodo{
 		Key:   "testKey",
 		Value: "testValue",
 	}
 	w := httptest.NewRecorder()
-	req, _ := http.NewRequest("POST", Url+"v1/user/add", ConvertTodoToIoReader(t, want))
+	req, _ := http.NewRequest("POST", Url+"v1/user/todo", ConvertTodoToIoReader(t, want))
 	Router.ServeHTTP(w, req)
 	assert.Equal(t, http.StatusOK, w.Code)
 	assert.Equal(t, ConvertStructToJson(t, want), w.Body.String())
@@ -106,7 +107,7 @@ func TestUserController_Add(t *testing.T) {
 
 func TestUserController_Delete(t *testing.T) {
 	t.Run("Delete (ok)", func(t *testing.T) {
-		testId := request_model.RequestId{
+		testId := model_request.RequestId{
 			Id: "1",
 		}
 		w := httptest.NewRecorder()
@@ -119,7 +120,7 @@ func TestUserController_Delete(t *testing.T) {
 	})
 
 	t.Run("Delete (Error)", func(t *testing.T) {
-		testId := request_model.RequestId{
+		testId := model_request.RequestId{
 			Id: "2",
 		}
 		w := httptest.NewRecorder()

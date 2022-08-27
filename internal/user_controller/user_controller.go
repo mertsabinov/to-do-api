@@ -1,18 +1,18 @@
 package user_controller
 
 import (
-	"api/internal/model/request_model"
-	"api/internal/user_services"
+	"api/internal/model/model_request"
+	user_service "api/internal/user_services"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"net/http"
 )
 
 type UserController struct {
-	UserServices user_services.Db
+	UserServices user_service.UserService
 }
 
-func NewUserConroller(UserServices user_services.Db) UserController {
+func NewUserConroller(UserServices user_service.UserService) UserController {
 	return UserController{
 		UserServices: UserServices,
 	}
@@ -23,7 +23,7 @@ func (us *UserController) Ping(ctx *gin.Context) {
 }
 
 func (us *UserController) Add(ctx *gin.Context) {
-	var todo request_model.RequestTodo
+	var todo model_request.RequestTodo
 	err := ctx.ShouldBindJSON(&todo)
 	newId := uuid.NewString()
 	err = us.UserServices.Add(newId, todo)
@@ -40,7 +40,7 @@ func (us *UserController) GetAll(ctx *gin.Context) {
 }
 
 func (us *UserController) Delete(ctx *gin.Context) {
-	var body request_model.RequestId
+	var body model_request.RequestId
 	err := ctx.ShouldBindJSON(&body)
 	_, err = us.UserServices.Search(body.Id)
 	err = us.UserServices.Remove(body.Id)
@@ -59,7 +59,7 @@ func (us *UserController) CheckError(ctx *gin.Context, err error) {
 func (us *UserController) UserControllerRout(rg *gin.RouterGroup) {
 	userRoute := rg.Group("/user")
 	userRoute.GET("/ping", us.Ping)
-	userRoute.POST("/add", us.Add)
+	userRoute.POST("/todo", us.Add)
 	userRoute.GET("/todo", us.GetAll)
 	userRoute.DELETE("/todo", us.Delete)
 }
